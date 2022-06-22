@@ -19,6 +19,7 @@ public:
         this->dest = dest;
         this->speed = speed;
         calculateWeight();
+        cout<<"Edge created: "<<src.getId()<<" "<<dest.getId()<<" "<<weight<<endl;
     }
 
     float deg2rad(float deg) {
@@ -41,7 +42,7 @@ public:
 
     void calculateWeight() {
         float d = calculateDistance(src, dest);
-        cout<<d<<endl;
+        // cout<<d<<endl;
         weight = d/speed;
     }
 };

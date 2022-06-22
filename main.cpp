@@ -2,10 +2,12 @@
 
 int main()
 {
-    Graph g("graph.txt",{30,2});
-    g.addNode("A", -12.214925, -77.009733);
-    g.addNode("B",-12.208328810124613, -77.0046056069268);
-    g.addEdge(0,1,0);
+    cout<<"a";
+    Graph g({30,2});
+    
+    g.readData("bus.txt");
+    g.readData("railway.txt");
+
     g.printGraph();
     return 0;
 }

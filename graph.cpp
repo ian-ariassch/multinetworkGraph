@@ -2,19 +2,24 @@
 #include <string>
 #include <vector>
 #include <stdio.h>
+#include <fstream>
 #include "edge.cpp"
+#include <sstream>
+#include <map>
 
 using namespace std;
 
 class Graph {
 private:
+    map<string,int> nodeMap;
     int V;
     vector<float> speeds;
     vector<Node> nodes;
     vector<vector<pair<Edge,Node>>> adj;
     int nodeCounter = 0;
+    int transportCounter = 0;
 public:
-    Graph(string file, vector<float> speeds) {
+    Graph(vector<float> speeds) {
         this->speeds = speeds;
     }
     
@@ -22,27 +27,80 @@ public:
     {
         auto temp = new Node(nodeCounter, name, {1,1}, lat, lon);
         nodes.push_back(*temp);
-        nodeCounter++;
         cout<<"Node "<<name<<" added"<<endl;
         adj.push_back({});
+        nodeCounter++;
     }
     void addEdge(int src, int dest, int transportMethod)
     {   
         float transportMethodSpeed = speeds[transportMethod];
-        adj[src].push_back(make_pair(Edge(nodes[src], nodes[dest], transportMethodSpeed), nodes[dest]));
+        auto temp = new Edge(nodes[src], nodes[dest], transportMethodSpeed);
+        adj[src].push_back(make_pair(*temp, nodes[dest]));
     };
+
+    void readData(string file)
+    {
+        int nodeAmount = 0;
+        int internalNodeCounter = 0;
+        ifstream dataFile;
+        dataFile.open(file);
+        string line;
+        vector<string> tokens;
+        while(getline(dataFile, line))
+        {
+            stringstream ss(line);
+            string temp;
+            while(getline(ss, temp, '|'))
+            {
+                tokens.push_back(temp);
+            }
+
+            if(nodeAmount == 0)
+            {
+                nodeAmount = stoi(temp);
+                tokens.clear();
+                continue;
+            }
+            if(internalNodeCounter < nodeAmount)
+            {
+                    string nodeName = tokens[0];
+                    string coordinates = tokens[1];
+                    if(nodeMap.find(coordinates) == nodeMap.end())
+                    {
+                        float lat = stof(coordinates.substr(0, coordinates.find(" ")));
+                        float lon = stof(coordinates.substr(coordinates.find(" ")+1));
+                        nodeMap.insert(make_pair(coordinates, nodeCounter));
+                        addNode(nodeName, lat, lon);
+                    }
+                    internalNodeCounter++;
+            }
+            else
+            {
+                string origin = tokens[0];
+                string destination = tokens[1];
+                addEdge(nodeMap[origin], nodeMap[destination], transportCounter);
+            }
+            tokens.clear();
+            
+        }
+        transportCounter++;
+        dataFile.close();
+    }
 
     void printGraph()
     {
         for(int i = 0; i<nodes.size(); i++)
         {
-            cout<<nodes[i].name<<": ";
+            cout<<nodes[i].name<<" conectado a:"<<endl;;
+    
 
             for(auto y: adj[i])
             {
                 cout<<"{"<<y.first.weight<<",";
-                cout<<y.second.name<<"}"<<endl;
+                cout<<y.second.name<<"}|";
             }
+            cout<<endl;
         }
+
     };
 };
