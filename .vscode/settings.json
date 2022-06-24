@@ -4,6 +4,16 @@
         "vector": "cpp",
         "xstring": "cpp",
         "string": "cpp",
-        "map": "cpp"
+        "map": "cpp",
+        "utility": "cpp",
+        "stack": "cpp",
+        "system_error": "cpp",
+        "xlocale": "cpp",
+        "xtree": "cpp",
+        "xutility": "cpp",
+        "iostream": "cpp",
+        "initializer_list": "cpp",
+        "iomanip": "cpp",
+        "ios": "cpp"
     }
 }

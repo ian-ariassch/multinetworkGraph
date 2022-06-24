@@ -6,21 +6,30 @@
 #include "edge.cpp"
 #include <sstream>
 #include <map>
+#include <stack>
+#include <set>
+#include <algorithm>
 
 using namespace std;
 
 class Graph {
 private:
     map<string,int> nodeMap;
+
     int V;
     vector<float> speeds;
-    vector<Node> nodes;
-    vector<vector<pair<Edge,Node>>> adj;
     int nodeCounter = 0;
     int transportCounter = 0;
 public:
+    map<string,int> nodeNameMap;
+    vector<Node> nodes;
+    vector<vector<pair<Edge,Node>>> adj;
     Graph(vector<float> speeds) {
         this->speeds = speeds;
+    }
+
+    int getNodeCounter() {
+        return nodeCounter;
     }
     
     void addNode(string name, float lat, float lon)
@@ -34,7 +43,7 @@ public:
     void addEdge(int src, int dest, int transportMethod)
     {   
         float transportMethodSpeed = speeds[transportMethod];
-        auto temp = new Edge(nodes[src], nodes[dest], transportMethodSpeed);
+        auto temp = new Edge(nodes[src], nodes[dest], transportMethodSpeed, transportMethod);
         adj[src].push_back(make_pair(*temp, nodes[dest]));
     };
 
@@ -70,8 +79,14 @@ public:
                         float lat = stof(coordinates.substr(0, coordinates.find(" ")));
                         float lon = stof(coordinates.substr(coordinates.find(" ")+1));
                         nodeMap.insert(make_pair(coordinates, nodeCounter));
+                        nodeNameMap.insert(make_pair(nodeName, nodeCounter));
                         addNode(nodeName, lat, lon);
                     }
+                    else
+                    {
+                        nodeNameMap.insert(make_pair(nodeName, nodeMap[coordinates]));
+                    }
+
                     internalNodeCounter++;
             }
             else

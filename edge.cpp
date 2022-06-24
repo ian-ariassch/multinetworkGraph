@@ -2,6 +2,7 @@
 #include <vector>
 #include "node.cpp"
 #include <math.h>
+#include <climits>
 
 #define M_PI 3.14159265358979323846
 
@@ -14,10 +15,19 @@ private:
     float speed;
 public:
     float weight;
-    Edge(Node src, Node dest, float speed) {
+    int transportMethod;
+
+    Edge()
+    {
+        weight = INT_MAX;
+        transportMethod = -1;
+    }
+
+    Edge(Node src, Node dest, float speed, int transportMethod) {
         this->src = src;
         this->dest = dest;
         this->speed = speed;
+        this->transportMethod = transportMethod;
         calculateWeight();
         cout<<"Edge created: "<<src.getId()<<" "<<dest.getId()<<" "<<weight<<endl;
     }
