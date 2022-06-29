@@ -8,17 +8,17 @@ float heuristic(Graph *g, int originId, int destinationId)
 }
 
 
-void Astar(Graph g, string originName, string destinationName, vector<bool> selectedStations, vector<string> stationsIds, bool print)
+vector<float> Astar(Graph *g, string originName, string destinationName, vector<bool> selectedStations, vector<string> stationsIds, bool print)
 {
-    int originId = g.nodeNameMap[originName];
-    int destinationId = g.nodeNameMap[destinationName];
+    int originId = g->nodeNameMap[originName];
+    int destinationId = g->nodeNameMap[destinationName];
     set<pair<float,int>> openList;
     vector<float> Gcost, Fcost;
     vector<pair<int,string>> parent;
     map<int,bool> isInOpenList;
 
 
-    for(int node = 0; node < g.getNodeCounter(); node++)
+    for(int node = 0; node < g->getNodeCounter(); node++)
     {
         Gcost.push_back(INT_MAX);
         Fcost.push_back(INT_MAX);
@@ -27,7 +27,7 @@ void Astar(Graph g, string originName, string destinationName, vector<bool> sele
         isInOpenList.insert(make_pair(node,false));
     }
     Gcost[originId] = 0;
-    Fcost[originId] = heuristic(&g,originId,originId);
+    Fcost[originId] = heuristic(g,originId,originId);
 
     openList.insert(make_pair(Fcost[originId],originId));
     isInOpenList[originId] = true;
@@ -47,14 +47,14 @@ void Astar(Graph g, string originName, string destinationName, vector<bool> sele
             cout<<"broke in "<<i<<" iterations"<<endl;
             break;
         }
-        for(auto edge : g.adj[currentNodeId])
+        for(auto edge : g->adj[currentNodeId])
         {
             int neighbor = edge.second.getId();
             float weight = edge.first.weight;
             if(selectedStations[edge.first.transportMethod] && Gcost[currentNodeId] + weight < Gcost[neighbor])
             {
                 Gcost[neighbor] = Gcost[currentNodeId] + weight;
-                Fcost[neighbor] = Gcost[neighbor] + heuristic(&g,originId, neighbor);
+                Fcost[neighbor] = Gcost[neighbor] + heuristic(g,originId, neighbor);
                 parent[neighbor] = make_pair(currentNodeId, stationsIds[edge.first.transportMethod]);
                 if(!isInOpenList[neighbor])
                 {
@@ -69,7 +69,7 @@ void Astar(Graph g, string originName, string destinationName, vector<bool> sele
     if(print){
     stack<string> route;
     int ParentNodeId = parent[destinationId].first;
-    auto ParentNode = g.nodes[ParentNodeId];
+    auto ParentNode = g->nodes[ParentNodeId];
     auto ParentNodeTransportMethod = parent[destinationId].second;
     route.push(destinationName + " via " + ParentNodeTransportMethod);
     while(parent[ParentNodeId].first != ParentNodeId)
@@ -78,7 +78,7 @@ void Astar(Graph g, string originName, string destinationName, vector<bool> sele
         route.push(ParentNode.name + " via " + ParentNodeTransportMethod);
         ParentNodeId = parent[ParentNodeId].first;
         //  cout<<ParentNodeId<<" 2 "<<endl;
-        ParentNode = g.nodes[ParentNodeId];
+        ParentNode = g->nodes[ParentNodeId];
         ParentNodeTransportMethod = parent[ParentNodeId].second;
     }
     route.push(originName);
@@ -87,4 +87,8 @@ void Astar(Graph g, string originName, string destinationName, vector<bool> sele
         cout << route.top() <<endl;
         route.pop();
     }}
+
+    cout<<"Reached from "<<originName<<" to "<<destinationName<<" in "<<Gcost[destinationId] * 60<<" minutes"<<endl;
+
+    return Gcost;
 }

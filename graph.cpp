@@ -34,7 +34,9 @@ public:
     
     void addNode(string name, float lat, float lon)
     {
-        auto temp = new Node(nodeCounter, name, {1,1}, lat, lon);
+        vector<bool> stationType = {0,0};
+        stationType[transportCounter] = 1;
+        auto temp = new Node(nodeCounter, name, stationType, lat, lon);
         nodes.push_back(*temp);
         cout<<"Node "<<name<<" added"<<endl;
         adj.push_back({});
@@ -85,6 +87,7 @@ public:
                     else
                     {
                         nodeNameMap.insert(make_pair(nodeName, nodeMap[coordinates]));
+                        nodes[nodeMap[coordinates]].stationType[transportCounter] = 1;
                     }
 
                     internalNodeCounter++;
