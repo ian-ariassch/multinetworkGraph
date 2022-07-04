@@ -10,12 +10,12 @@ vector<pair<string,string>> readTestCases(string fileName)
     vector<string> tokens;
     while (getline(file, line))
     {
+        line.erase(remove(line.begin(), line.end(), '\r'), line.end());
         stringstream linestream(line);
-        string item;
-        while (getline(linestream, item, '|'))
+        string token;
+        while (getline(linestream, token, '-'))
         {
-            // std::cout <<  item << endl;
-            tokens.push_back(item);
+            tokens.push_back(token);
         }
         testCases.push_back(make_pair(tokens[0], tokens[1]));
         tokens.clear();
@@ -46,14 +46,12 @@ int main()
     {   
         string originName = testcases[i].first;
         string destinationName = testcases[i].second;
-        cout<<originName<<" - "<<destinationName;
-        cout<<testcases[i].second<<endl;
-        // writeToFile("testcaseOutput.txt", "\n" + test.first + "-" + test.second + "\n");
-        // // writeToFile(fileOutput, "\n");
-        // Astar(&g,originName, destinationName, {1,0}, stationsIds,print,fileOutput);
-        // Astar(&g,test.first, test.second, {0,1}, stationsIds,print,fileOutput);
-        // Astar(&g,test.first, test.second, {1,1}, stationsIds,print,fileOutput);
-        break;
+        cout<<originName<<" - "<<destinationName<<endl;
+        // writeToFile("testcaseOutput.txt", "\n" + originName + "-" + destinationName + "\n");
+        writeToFile(fileOutput, "\n");
+        Astar(&g,originName, destinationName, {1,0}, stationsIds,print,fileOutput);
+        Astar(&g,originName, destinationName, {0,1}, stationsIds,print,fileOutput);
+        Astar(&g,originName, destinationName, {1,1}, stationsIds,print,fileOutput);
     }
 
     // cout<<g.nodeNameMap["Punto 40 Tren"]<<endl;
