@@ -1,8 +1,6 @@
-#include <iostream>
-#include <string>
+#include "utils.cpp"
 #include <vector>
 #include <stdio.h>
-#include <fstream>
 #include "edge.cpp"
 #include <sstream>
 #include <map>
@@ -38,7 +36,6 @@ public:
         stationType[transportCounter] = 1;
         auto temp = new Node(nodeCounter, name, stationType, lat, lon);
         nodes.push_back(*temp);
-        cout<<"Node "<<name<<" added"<<endl;
         adj.push_back({});
         nodeCounter++;
     }

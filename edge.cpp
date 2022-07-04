@@ -27,7 +27,6 @@ public:
         this->speed = speed;
         this->transportMethod = transportMethod;
         calculateWeight();
-        cout<<"Edge created: "<<src.getId()<<" "<<dest.getId()<<" "<<weight<<endl;
     }
 
     void calculateWeight() {

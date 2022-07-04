@@ -1,4 +1,47 @@
-#include "dijkstra.cpp"
+#include "graph.cpp"
+
+
+float calculateNodeDistances(Graph *g, int originId, int destinationId)
+{
+    auto origin = g->nodes[originId];
+    auto destination = g->nodes[destinationId];
+    return calculateHarvesineDistance(origin,destination);
+    
+}
+
+pair<int,float> findClosestValidStation(Graph *g, int startingId, vector<bool> selectedStations)
+{
+    int closestId = -1;
+    int walkingSpeed = 10;
+    float closestDistance = INT_MAX;
+    for (int destinationNode = 0; destinationNode < g->getNodeCounter(); destinationNode++)
+    {
+        auto nodeStations = g->nodes[destinationNode].stationType;
+        bool isValid = 0;
+        for(int i = 0; i < nodeStations.size(); i++)
+        {
+            if(nodeStations[i] == selectedStations[i] == 1)
+            {
+                isValid = 1;
+                // break;
+            }
+        }
+        if (isValid)
+        {
+            float distance = calculateNodeDistances(g,startingId,destinationNode); 
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestId = destinationNode;
+            }
+        }
+    }
+
+    return make_pair(closestId, closestDistance/walkingSpeed);
+}
+
+
+
 
 float heuristic(Graph *g, int originId, int destinationId)
 {
@@ -7,8 +50,7 @@ float heuristic(Graph *g, int originId, int destinationId)
     return sqrt(pow(origin.getCoordX() - destination.getCoordX(), 2) + pow(origin.getCoordX() - destination.getCoordY(), 2));
 }
 
-
-vector<float> Astar(Graph *g, string originName, string destinationName, vector<bool> selectedStations, vector<string> stationsIds, bool print)
+void Astar(Graph *g, string originName, string destinationName, vector<bool> selectedStations, vector<string> stationsIds, bool print, string file = "")
 {
     int originId = g->nodeNameMap[originName];
     int destinationId = g->nodeNameMap[destinationName];
@@ -16,13 +58,31 @@ vector<float> Astar(Graph *g, string originName, string destinationName, vector<
     vector<float> Gcost, Fcost;
     vector<pair<int,string>> parent;
     map<int,bool> isInOpenList;
+    cout<<originId<<" "<<destinationId<<endl;
+    auto closestValidStation = findClosestValidStation(g, originId, selectedStations);
+    
+    auto addedTime = closestValidStation.second;
+
+
+    cout<<closestValidStation.first<<" "<<closestValidStation.second<<endl;
+
+    originId = closestValidStation.first;
+
+    // originName = g->nodes[originId].name;
+
+    closestValidStation = findClosestValidStation(g,destinationId,selectedStations);
+
+    destinationId = closestValidStation.first;
+
+    // destinationName = g->nodes[destinationId].name;
+
+    addedTime += closestValidStation.second;
 
 
     for(int node = 0; node < g->getNodeCounter(); node++)
     {
         Gcost.push_back(INT_MAX);
         Fcost.push_back(INT_MAX);
-        // Hcost.push_back(heuristic(g, originId, node));
         parent.push_back(make_pair(node,""));
         isInOpenList.insert(make_pair(node,false));
     }
@@ -44,7 +104,6 @@ vector<float> Astar(Graph *g, string originName, string destinationName, vector<
 
         if(currentNodeId == destinationId)
         {
-            cout<<"broke in "<<i<<" iterations"<<endl;
             break;
         }
         for(auto edge : g->adj[currentNodeId])
@@ -74,10 +133,8 @@ vector<float> Astar(Graph *g, string originName, string destinationName, vector<
     route.push(destinationName + " via " + ParentNodeTransportMethod);
     while(parent[ParentNodeId].first != ParentNodeId)
     {
-        // cout<<ParentNodeId<<endl;
         route.push(ParentNode.name + " via " + ParentNodeTransportMethod);
         ParentNodeId = parent[ParentNodeId].first;
-        //  cout<<ParentNodeId<<" 2 "<<endl;
         ParentNode = g->nodes[ParentNodeId];
         ParentNodeTransportMethod = parent[ParentNodeId].second;
     }
@@ -88,7 +145,16 @@ vector<float> Astar(Graph *g, string originName, string destinationName, vector<
         route.pop();
     }}
 
-    cout<<"Reached from "<<originName<<" to "<<destinationName<<" in "<<Gcost[destinationId] * 60<<" minutes"<<endl;
+    // cout<<originId<<" "<<originName<<endl;
+    // cout<<destinationId<<" "<<destinationName<<endl;
+    cout<<"Reached from "<<originName<<" to "<<destinationName<<" in "<<to_string((Gcost[destinationId] + addedTime )* 60)<<" minutes"<<endl;
+    cout<<"Time lost: "<<addedTime*60<<endl;
 
-    return Gcost;
+    writeToFile(file,to_string((Gcost[destinationId] + addedTime)* 60)+"\t");
+
+    Gcost.clear();
+    Fcost.clear();
+    parent.clear();
+    isInOpenList.clear();
+    openList.clear();
 }

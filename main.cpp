@@ -2,13 +2,31 @@
 #include <time.h>
 #include <iomanip>
 
+vector<pair<string,string>> readTestCases(string fileName)
+{
+    vector<pair<string,string>> testCases;
+    ifstream file(fileName);
+    string line;
+    vector<string> tokens;
+    while (getline(file, line))
+    {
+        stringstream linestream(line);
+        string item;
+        while (getline(linestream, item, '|'))
+        {
+            // std::cout <<  item << endl;
+            tokens.push_back(item);
+        }
+        testCases.push_back(make_pair(tokens[0], tokens[1]));
+        tokens.clear();
+    }
+    return testCases;
+}
+
 int main()
 {   
-
     float addedTime = 0;
     clock_t startDij,endDij, startAstar, endAstar;
-
-    cout<<"a";
     Graph g({20,35});
 
     g.readData("bus.txt");
@@ -16,20 +34,51 @@ int main()
 
     vector<string> stationsIds = {"bus","railway"};
 
-    vector<bool> selectedStations = {0,1};
+    vector<bool> selectedStations = {1,1};
     // g.printGraph();
     
+    bool print = 0;    
+    auto testcases = readTestCases("testcases");
+    string fileOutput = "testcaseOutput.txt";
+    ofstream dataFile(fileOutput, ios::trunc);
+    dataFile.close();
+    for(int i = 0; i < testcases.size(); i++)
+    {   
+        string originName = testcases[i].first;
+        string destinationName = testcases[i].second;
+        cout<<originName<<" - "<<destinationName;
+        cout<<testcases[i].second<<endl;
+        // writeToFile("testcaseOutput.txt", "\n" + test.first + "-" + test.second + "\n");
+        // // writeToFile(fileOutput, "\n");
+        // Astar(&g,originName, destinationName, {1,0}, stationsIds,print,fileOutput);
+        // Astar(&g,test.first, test.second, {0,1}, stationsIds,print,fileOutput);
+        // Astar(&g,test.first, test.second, {1,1}, stationsIds,print,fileOutput);
+        break;
+    }
+
+    // cout<<g.nodeNameMap["Punto 40 Tren"]<<endl;
+
+    // Astar(&g,"Punto 26 Bus", "Punto 15 Tren", selectedStations, stationsIds,1,fileOutput);
+    // Astar(&g,"Punto 26 Bus", "Punto 1 Bus", selectedStations, stationsIds,1,fileOutput);
     
-    string originName = "Punto 40 Tren";
-    string destinationName = "Punto 23 Bus";
-    startAstar = clock();
-        // auto shortestPath = Astar(&g,originName, destinationName, selectedStations, stationsIds,1);
-    endAstar = clock();
-    
-    startDij = clock();
-     auto dijkstraData = dijkstra(&g,originName, selectedStations,stationsIds,addedTime);
-     printShortestRoute(dijkstraData, destinationName, &g, selectedStations, addedTime);
-    endDij = clock();
+
+
+
+    // // auto dijkstraData = dijkstra(&g,originName, selectedStations,stationsIds,addedTime);
+    // // printShortestRoute(dijkstraData, destinationName, &g, selectedStations, addedTime, print);
+
+    // addedTime = 0;
+
+    // selectedStations = {0,1};
+    // auto dijkstraData = dijkstra(&g,originName, selectedStations,stationsIds,addedTime);
+    // printShortestRoute(dijkstraData, destinationName, &g, selectedStations, addedTime, print);
+
+    // addedTime = 0;
+
+    // selectedStations = {1,1};
+    // dijkstraData = dijkstra(&g,originName, selectedStations,stationsIds,addedTime);
+    // printShortestRoute(dijkstraData, destinationName, &g, selectedStations, addedTime, print);
+    // endDij = clock();
 
     // cout<<"Closest Alternative to "<<originName<<" is "<<g.nodes[findClosestAlternativeStation(&g, g.nodeNameMap[originName], selectedStations)].name<<endl;
     
