@@ -10,7 +10,6 @@ class Edge {
 private:
     Node src;
     Node dest;
-    float speed;
 public:
     float weight;
     int transportMethod;
@@ -21,18 +20,11 @@ public:
         transportMethod = -1;
     }
 
-    Edge(Node src, Node dest, float speed, int transportMethod) {
+    Edge(Node src, Node dest, float weight, int transportMethod) {
         this->src = src;
         this->dest = dest;
-        this->speed = speed;
         this->transportMethod = transportMethod;
-        calculateWeight();
+        this->weight = weight;
         cout<<"Edge created: "<<src.getId()<<" "<<dest.getId()<<" "<<weight<<endl;
-    }
-
-    void calculateWeight() {
-        float d = calculateHarvesineDistance(src, dest);
-        // cout<<d<<endl;
-        weight = d/speed;
     }
 };

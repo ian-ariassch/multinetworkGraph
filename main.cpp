@@ -2,6 +2,28 @@
 #include <time.h>
 #include <iomanip>
 
+
+vector<pair<string,string>> readTestCases(string fileName)
+{
+    vector<pair<string,string>> testCases;
+    ifstream file(fileName);
+    string line;
+    vector<string> tokens;
+    while (getline(file, line))
+    {
+        line.erase(remove(line.begin(), line.end(), '\r'), line.end());
+        stringstream linestream(line);
+        string token;
+        while (getline(linestream, token, '-'))
+        {
+            tokens.push_back(token);
+        }
+        testCases.push_back(make_pair(tokens[0], tokens[1]));
+        tokens.clear();
+    }
+    return testCases;
+}
+
 int main()
 {   
 
@@ -13,47 +35,33 @@ int main()
 
     g.readData("bus.txt");
     g.readData("railway.txt");
+    cout<<g.nodes[g.nodeNameMap["Punto 22 Bus"]].getCoordX()<<" "<<g.nodes[g.nodeNameMap["Punto 22 Bus"]].getCoordY()<<endl;
+    // g.printGraph();
 
     vector<string> stationsIds = {"bus","railway"};
 
-    vector<bool> selectedStations = {0,1};
+    vector<bool> selectedStations = {1,1};
     // g.printGraph();
     
     
-    string originName = "Punto 40 Tren";
-    string destinationName = "Punto 23 Bus";
-    startAstar = clock();
-        // auto shortestPath = Astar(&g,originName, destinationName, selectedStations, stationsIds,1);
-    endAstar = clock();
-    
-    startDij = clock();
-     auto dijkstraData = dijkstra(&g,originName, selectedStations,stationsIds,addedTime);
-     printShortestRoute(dijkstraData, destinationName, &g, selectedStations, addedTime);
-    endDij = clock();
+    bool print = 1;    
+    auto testcases = readTestCases("testcases");
+    string fileOutput = "testcaseOutput.txt";
+    ofstream dataFile(fileOutput, ios::trunc);
+    dataFile.close();
 
-    // cout<<"Closest Alternative to "<<originName<<" is "<<g.nodes[findClosestAlternativeStation(&g, g.nodeNameMap[originName], selectedStations)].name<<endl;
-    
-    // findClosestAlternativeStation(&g, g.nodeNameMap[originName], selectedStations);
+    for(int i = 0; i < testcases.size(); i++)
+    {   
+        string originName = testcases[i].first;
+        string destinationName = testcases[i].second;
+        cout<<originName<<" - "<<destinationName<<endl;
+        // writeToFile("testcaseOutput.txt", "\n" + originName + "-" + destinationName + "\n");
+        writeToFile(fileOutput, "\n");
+        writeToFile("times.txt", "\n");
+        Astar(&g,originName, destinationName, {1,0}, stationsIds,print,fileOutput);
+        Astar(&g,originName, destinationName, {0,1}, stationsIds,print,fileOutput);
+        Astar(&g,originName, destinationName, {1,1}, stationsIds,print,fileOutput);
+    }
 
-    // cout<<g.nodes[g.nodeNameMap[originName]].getCoordX()<<endl;
-    // cout<<g.nodes[g.nodeNameMap[originName]].getCoordY()<<endl;;
-
-    // cout<<endl;
-
-    // cout<<g.nodes[g.nodeNameMap[destinationName]].getCoordX()<<endl;
-    // cout<<g.nodes[g.nodeNameMap[destinationName]].getCoordY()<<endl;
-
-    // cout<<calculateHarvesineDistance(g.nodes[g.nodeNameMap[originName]],g.nodes[g.nodeNameMap[destinationName]])<<endl;
-
-
-    // double time_taken = double(endDij - startDij) / double(CLOCKS_PER_SEC);
-    // cout << "Time taken by Dijkstra is : " << fixed 
-    //      << time_taken << setprecision(5);
-    // cout << " sec " << endl;
-
-    // time_taken = double(endAstar - startAstar) / double(CLOCKS_PER_SEC);
-    // cout << "Time taken by Astar is : " << fixed 
-    //      << time_taken << setprecision(5);
-    // cout << " sec " << endl;
     return 0;
 }

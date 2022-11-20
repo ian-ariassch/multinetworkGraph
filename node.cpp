@@ -53,11 +53,11 @@ float deg2rad(float deg) {
 float calculateHarvesineDistance(Node src, Node dest)
 {
     float R = 6371;
-    float dLat = deg2rad(dest.getCoordY() - src.getCoordY());
-    float dLon = deg2rad(dest.getCoordX() - src.getCoordX());
+    float dLat = deg2rad(dest.getCoordX() - src.getCoordX());
+    float dLon = deg2rad(dest.getCoordY() - src.getCoordY());
     float a =
         sin(dLat / 2) * sin(dLat / 2) +
-        cos(deg2rad(src.getCoordY())) * cos(deg2rad(dest.getCoordY())) *
+        cos(deg2rad(src.getCoordX())) * cos(deg2rad(dest.getCoordX())) *
         sin(dLon / 2) * sin(dLon / 2);
     float c = 2 * atan2(sqrt(a), sqrt(1 - a));
     float d = R * c;

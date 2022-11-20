@@ -1,5 +1,30 @@
 import math
 
+predictedTimeDictionaryBus = {}
+
+predictedTimeDictionaryRailway = {}
+
+def fillDictionary():
+    file = open("./predictions/busNNPredictions.csv")
+    for i in file:
+        i = i.split(",")
+        setOfCoords = i[2] + " " + i[3] + "," + i[4] + " " + i[5]
+        predictedTimeDictionaryBus[setOfCoords] = i[7]
+        
+
+    file.close()
+
+    file = open("./predictions/railwayNNPredictions.csv")
+    for i in file:
+        i = i.split(",")
+        setOfCoords = i[2] + " " + i[3] + "," + i[4] + " " + i[5]
+        predictedTimeDictionaryRailway[setOfCoords] = i[7]
+
+    file.close()
+
+    # print(predictedTimeDictionaryBus)
+
+
 def calculateRealWorldDistanceinKm(edge1, edge2):
 
     coords1 = edge1.split(" ") 
@@ -22,6 +47,13 @@ def calculateRealWorldDistanceinKm(edge1, edge2):
 def replaceSpaceWithComma(line):
     line = line.split(" ")
     return line[1]+","+line[0]
+
+def switchLatLon(line):
+    line = line.split(",")
+    coord1 = line[0].split(" ")
+    coord2 = line[1].split(" ")
+    return coord1[1] + " " + coord1[0] + "," + coord2[1] + " " + coord2[0]
+
 
 def cleanCsv(filename):
     file = open(filename+".csv")
@@ -59,9 +91,6 @@ def cleanCsv(filename):
                 singleCoordDivision = singleCoord.split(" ")
                 correctedLineCoordinates.append(singleCoordDivision[1]+" "+singleCoordDivision[0])
 
-            print("==================================================================")
-            print(correctedLineCoordinates)
-            print("´++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
             for j in range(len(correctedLineCoordinates)-1):
                 edge = (correctedLineCoordinates[j].strip(), correctedLineCoordinates[j+1].strip())
                 edges.append(edge)
@@ -74,18 +103,21 @@ def cleanCsv(filename):
 
     neuralNetworkFile = open(filename+"NN.csv", "w")
 
-    #write headers for neural network file
     neuralNetworkFile.write("speed,origin_lat,origin_lon,destination_lat,destination_lon,distance\n")
     
-
     file.write(str(len(nodes))+"\n")
-    # file.write(str(len(edges))+"\n")
 
     for i in nodes:
+        splittedCoords = i["coords"].split(" ")
+        i["coords"] = splittedCoords[1] + " " + splittedCoords[0]
         file.write(i["name"] + "|" + i["coords"] + "\n")
 
     for i in edges:
-        file.write(i[0] + "|" + i[1] + "\n")
+        if filename == "bus":
+            travelTime = predictedTimeDictionaryBus[switchLatLon(i[0]+","+i[1])]
+        elif filename == "railway":
+            travelTime = predictedTimeDictionaryRailway[switchLatLon(i[0]+","+i[1])]
+        file.write(i[0] + "|" + i[1] + "|" + travelTime)
         distance = calculateRealWorldDistanceinKm(i[0], i[1])
         neuralNetworkFile.write(str(speed) + "," + replaceSpaceWithComma(i[0]) + "," + replaceSpaceWithComma(i[1]) + "," + str(distance) + "\n")
 
@@ -93,5 +125,6 @@ def cleanCsv(filename):
     file.close()
     neuralNetworkFile.close()
 
+fillDictionary()
 cleanCsv("bus")
 cleanCsv("railway")

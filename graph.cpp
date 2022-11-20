@@ -9,6 +9,7 @@
 #include <stack>
 #include <set>
 #include <algorithm>
+#include "utils.cpp"
 
 using namespace std;
 
@@ -42,10 +43,9 @@ public:
         adj.push_back({});
         nodeCounter++;
     }
-    void addEdge(int src, int dest, int transportMethod)
+    void addEdge(int src, int dest, float weight, int transportMethod)
     {   
-        float transportMethodSpeed = speeds[transportMethod];
-        auto temp = new Edge(nodes[src], nodes[dest], transportMethodSpeed, transportMethod);
+        auto temp = new Edge(nodes[src], nodes[dest], weight, transportMethod);
         adj[src].push_back(make_pair(*temp, nodes[dest]));
     };
 
@@ -57,8 +57,10 @@ public:
         dataFile.open(file);
         string line;
         vector<string> tokens;
+        int lineCounter = 0;
         while(getline(dataFile, line))
         {
+            lineCounter++;
             stringstream ss(line);
             string temp;
             while(getline(ss, temp, '|'))
@@ -76,6 +78,8 @@ public:
             {
                     string nodeName = tokens[0];
                     string coordinates = tokens[1];
+                    vector<string> coordinatesTokens;
+
                     if(nodeMap.find(coordinates) == nodeMap.end())
                     {
                         float lat = stof(coordinates.substr(0, coordinates.find(" ")));
@@ -96,13 +100,19 @@ public:
             {
                 string origin = tokens[0];
                 string destination = tokens[1];
-                addEdge(nodeMap[origin], nodeMap[destination], transportCounter);
+                float weight = stof(tokens[2]);
+                if(nodes[nodeMap[destination]].name == "Punto 1 Bus")
+                {
+                    cout<<origin<<"|"<<destination<<" "<<nodeMap[destination]<<" "<<nodes[nodeMap[origin]].name<<endl;
+                }
+                addEdge(nodeMap[origin], nodeMap[destination], weight, transportCounter);
             }
             tokens.clear();
             
         }
         transportCounter++;
         dataFile.close();
+        cout<<"Data read "<<file<<" "<<lineCounter<<endl;
     }
 
     void printGraph()
